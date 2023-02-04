@@ -3,6 +3,8 @@
     "target": "es5",
     "module": "commonjs",
     "lib": ["DOM", "ES6", "ESNext.AsyncIterable"],
+    "outDir": "build",                          
+    "rootDir": "src",
     "sourceMap": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
