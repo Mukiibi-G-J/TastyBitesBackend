@@ -1,8 +1,8 @@
-import { CreateFoodInput, EditVendorInput, VendorLoginInput } from '../dto';
-import { Request, Response, NextFunction } from 'express';
-import { FindVendor } from './AdminController';
-import { GenerateSignature, ValidatePassword } from '../utils';
-import { Food } from '../models';
+import { CreateFoodInput, EditVendorInput, VendorLoginInput } from "../dto";
+import { Request, Response, NextFunction } from "express";
+import { FindVendor } from "./AdminController";
+import { GenerateSignature, ValidatePassword } from "../utils";
+import { Food } from "../models";
 
 export const VendorLogin = async (
   req: Request,
@@ -10,7 +10,7 @@ export const VendorLogin = async (
   next: NextFunction
 ) => {
   const { email, password } = <VendorLoginInput>req.body;
-  const existingUser = await FindVendor('', email);
+  const existingUser = await FindVendor("", email);
   if (existingUser !== null) {
     const validation = await ValidatePassword(
       password,
@@ -26,11 +26,11 @@ export const VendorLogin = async (
       });
       return res.json(signature);
     } else {
-      return res.json({ messege: 'Password isn not valid' });
+      return res.json({ messege: "Password isn not valid" });
     }
   }
 
-  return res.json({ message: 'Login credential is not valid' });
+  return res.json({ message: "Login credential is not valid" });
 };
 
 export const GetVendorProfile = async (
@@ -43,7 +43,7 @@ export const GetVendorProfile = async (
     const existingVendor = await FindVendor(user._id);
     return res.json(existingVendor);
   }
-  return res.json({ message: 'vendor Information Not Found' });
+  return res.json({ message: "vendor Information Not Found" });
 };
 
 export const UpdateVendorProfile = async (
@@ -64,7 +64,7 @@ export const UpdateVendorProfile = async (
       return res.json(saveResult);
     }
   }
-  return res.json({ message: 'Unable to Update vendor profile ' });
+  return res.json({ message: "Unable to Update vendor profile " });
 };
 
 export const UpdateVendorService = async (
@@ -87,11 +87,11 @@ export const UpdateVendorService = async (
       return res.json(saveResult);
     }
   }
-  return res.json({ message: 'Unable to Update vendor profile ' });
+  return res.json({ message: "Unable to Update vendor profile " });
 };
 
 export const AddFood = async (
-  req: Request,
+  req: Request, 
   res: Response,
   next: NextFunction
 ) => {
@@ -99,7 +99,7 @@ export const AddFood = async (
   const { name, description, category, foodType, readyTime, price } = <
     CreateFoodInput
   >req.body;
-
+  console.log(name, description, category, foodType, readyTime, price);
   if (user) {
     const vendor = await FindVendor(user._id);
 
@@ -125,7 +125,7 @@ export const AddFood = async (
       return res.json(result);
     }
   }
-  return res.json({ message: 'Unable to Update vendor profile ' });
+  return res.json({ message: "Unable to Update vendor profile " });
 };
 
 export const UpdateVendorCoverImage = async (
@@ -142,7 +142,7 @@ export const UpdateVendorCoverImage = async (
       const files = req.files as [Express.Multer.File];
 
       const images = files.map((file: Express.Multer.File) => file.filename);
-      console.log('runing----------');
+      console.log("runing----------");
       console.log(files);
       vendor.coverImages.push(...images);
 
@@ -151,7 +151,7 @@ export const UpdateVendorCoverImage = async (
       return res.json(saveResult);
     }
   }
-  return res.json({ message: 'Unable to Update vendor profile ' });
+  return res.json({ message: "Unable to Update vendor profile " });
 };
 
 export const GetFoods = async (
@@ -168,5 +168,5 @@ export const GetFoods = async (
       return res.json(foods);
     }
   }
-  return res.json({ message: 'Foods not found!' });
+  return res.json({ message: "Foods not found!" });
 };

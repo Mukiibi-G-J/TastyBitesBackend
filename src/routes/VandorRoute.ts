@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 // const multer = require('multer');
+import fs from 'fs';
 
 import {
   AddFood,
@@ -16,10 +17,16 @@ const router = express.Router();
 
 const imageStorage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, '');
+    // create folderimages if not exist
+    // how to create folder if not exist?
+    if (!fs.existsSync('src/images')) {
+      fs.mkdirSync('src/images');
+    }
+    cb(null, 'src/images');
+  
   },
   filename: function (req, file, cb) {
-    cb(null, new Date().toISOString() + '_' + file.originalname);
+    cb(null, new Date().toISOString().replace(/-/g, '_').replace(/:/g, '_') + file.originalname)                   
   },
 });
 
