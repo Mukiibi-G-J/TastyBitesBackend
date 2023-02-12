@@ -1,12 +1,12 @@
-import { plainToClass } from 'class-transformer';
-import { validate } from 'class-validator';
-import express, { Request, Response, NextFunction } from 'express';
+import { plainToClass } from "class-transformer";
+import { validate } from "class-validator";
+import express, { Request, Response, NextFunction } from "express";
 import {
   CreateCustomerInput,
   EditCustomerProfileInput,
   UserLoginInput,
-} from '../dto';
-import { Customer } from '../models';
+} from "../dto";
+import { Customer } from "../models";
 import {
   GenerateOtp,
   GeneratePassword,
@@ -14,7 +14,8 @@ import {
   GenerateSignature,
   onRequestOTP,
   ValidatePassword,
-} from '../utils';
+} from "../utils";
+
 
 export const CustomerSignUp = async (
   req: Request,
@@ -45,7 +46,7 @@ export const CustomerSignUp = async (
   // };
   // if (existingCustomer !== null)
   if (existingCustomer.length > 0) {
-    return res.status(400).json({ message: 'Email already exist!' });
+    return res.status(400).json({ message: "Email already exist!" });
   }
 
   const result = await Customer.create({
@@ -55,9 +56,9 @@ export const CustomerSignUp = async (
     phone: phone,
     otp: otp,
     otp_expiry: expiry,
-    firstName: '',
-    lastName: '',
-    address: '',
+    firstName: "",
+    lastName: "",
+    address: "",
     verified: false,
     lat: 0,
     lng: 0,
@@ -66,7 +67,8 @@ export const CustomerSignUp = async (
 
   if (result) {
     // send OTP to customer
-    await onRequestOTP(otp, phone);
+
+    // await onRequestOTP(otp, phone);
 
     // Generate the Signature
     const signature = await GenerateSignature({
@@ -80,7 +82,7 @@ export const CustomerSignUp = async (
       .json({ signature, verified: result.verified, email: result.email });
   }
 
-  return res.status(400).json({ msg: 'Error while creating user' });
+  return res.status(400).json({ msg: "Error while creating user" });
 };
 
 export const CustomerVerify = async (
@@ -90,9 +92,11 @@ export const CustomerVerify = async (
 ) => {
   const { otp } = req.body;
   const customer = req.user;
+  console.log(otp);
 
   if (customer) {
     const profile = await Customer.findById(customer._id);
+    console.log(profile);
     if (profile) {
       if (profile.otp === parseInt(otp) && profile.otp_expiry >= new Date()) {
         profile.verified = true;
@@ -112,9 +116,12 @@ export const CustomerVerify = async (
         });
       }
     }
+    // else{
+    //   return res.status(400).json({ msg: 'Unable to verify Customer' });
+    // }
   }
 
-  return res.status(400).json({ msg: 'Unable to verify Customer' });
+  return res.status(400).json({ msg: "Unable to verify Customer" });
 };
 
 export const CustomerLogin = async (
@@ -156,7 +163,7 @@ export const CustomerLogin = async (
     }
   }
 
-  return res.json({ msg: 'Error With Signup' });
+  return res.json({ msg: "Error With Signup" });
 };
 
 export const RequestOtp = async (
@@ -179,11 +186,11 @@ export const RequestOtp = async (
 
       return res
         .status(200)
-        .json({ message: 'OTP sent to your registered Mobile Number!' });
+        .json({ message: "OTP sent to your registered Mobile Number!" });
     }
   }
 
-  return res.status(400).json({ msg: 'Error with Requesting OTP' });
+  return res.status(400).json({ msg: "Error with Requesting OTP" });
 };
 
 export const GetCustomerProfile = async (
@@ -200,7 +207,7 @@ export const GetCustomerProfile = async (
       return res.status(201).json(profile);
     }
   }
-  return res.status(400).json({ msg: 'Error while Fetching Profile' });
+  return res.status(400).json({ msg: "Error while Fetching Profile" });
 };
 
 export const EditCustomerProfile = async (
@@ -234,5 +241,5 @@ export const EditCustomerProfile = async (
       return res.status(201).json(result);
     }
   }
-  return res.status(400).json({ msg: 'Error while Updating Profile' });
+  return res.status(400).json({ msg: "Error while Updating Profile" });
 };
