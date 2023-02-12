@@ -13,16 +13,16 @@ var middlewares_1 = require("../middlewares");
 var router = express_1.default.Router();
 exports.CustomerRoute = router;
 /* ------------------- Suignup / Create Customer --------------------- */
-router.post('/signup', controllers_1.CustomerSignUp);
+router.post("/signup", controllers_1.CustomerSignUp);
 /* ------------------- Login --------------------- */
-router.post('/login', controllers_1.CustomerLogin);
+router.post("/login", controllers_1.CustomerLogin);
 // /* ------------------- Authentication --------------------- */
 router.use(middlewares_1.Authenticate);
 // /* ------------------- Verify Customer Account --------------------- */
-router.patch('/verify', controllers_1.CustomerVerify);
+router.patch("/verify", controllers_1.CustomerVerify);
 // /* ------------------- OTP / request OTP --------------------- */
-router.get('/otp', controllers_1.RequestOtp);
+router.get("/otp", controllers_1.RequestOtp);
 // /* ------------------- Profile --------------------- */
-router.get('/profile', controllers_1.GetCustomerProfile);
-router.patch('/profile', controllers_1.EditCustomerProfile);
+router.get("/profile", controllers_1.GetCustomerProfile);
+router.patch("/profile", controllers_1.EditCustomerProfile);
 //# sourceMappingURL=CustomerRoute.js.map

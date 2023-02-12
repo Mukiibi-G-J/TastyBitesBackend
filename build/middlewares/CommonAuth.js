@@ -45,6 +45,7 @@ var Authenticate = function (req, res, next) { return __awaiter(void 0, void 0, 
             case 0: return [4 /*yield*/, (0, utils_1.ValidateSignature)(req)];
             case 1:
                 signature = _a.sent();
+                console.log(signature);
                 if (signature) {
                     return [2 /*return*/, next()];
                 }

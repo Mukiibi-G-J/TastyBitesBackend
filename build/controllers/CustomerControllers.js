@@ -73,7 +73,7 @@ var CustomerSignUp = function (req, res, next) { return __awaiter(void 0, void 0
                 // };
                 // if (existingCustomer !== null)
                 if (existingCustomer.length > 0) {
-                    return [2 /*return*/, res.status(400).json({ message: 'Email already exist!' })];
+                    return [2 /*return*/, res.status(400).json({ message: "Email already exist!" })];
                 }
                 return [4 /*yield*/, models_1.Customer.create({
                         email: email,
@@ -82,9 +82,9 @@ var CustomerSignUp = function (req, res, next) { return __awaiter(void 0, void 0
                         phone: phone,
                         otp: otp,
                         otp_expiry: expiry,
-                        firstName: '',
-                        lastName: '',
-                        address: '',
+                        firstName: "",
+                        lastName: "",
+                        address: "",
                         verified: false,
                         lat: 0,
                         lng: 0,
@@ -92,24 +92,19 @@ var CustomerSignUp = function (req, res, next) { return __awaiter(void 0, void 0
                     })];
             case 5:
                 result = _b.sent();
-                if (!result) return [3 /*break*/, 8];
-                // send OTP to customer
-                return [4 /*yield*/, (0, utils_1.onRequestOTP)(otp, phone)];
-            case 6:
-                // send OTP to customer
-                _b.sent();
+                if (!result) return [3 /*break*/, 7];
                 return [4 /*yield*/, (0, utils_1.GenerateSignature)({
                         _id: result._id,
                         email: result.email,
                         verified: result.verified,
                     })];
-            case 7:
+            case 6:
                 signature = _b.sent();
                 // Send the result
                 return [2 /*return*/, res
                         .status(201)
                         .json({ signature: signature, verified: result.verified, email: result.email })];
-            case 8: return [2 /*return*/, res.status(400).json({ msg: 'Error while creating user' })];
+            case 7: return [2 /*return*/, res.status(400).json({ msg: "Error while creating user" })];
         }
     });
 }); };
@@ -121,10 +116,12 @@ var CustomerVerify = function (req, res, next) { return __awaiter(void 0, void 0
             case 0:
                 otp = req.body.otp;
                 customer = req.user;
+                console.log(otp);
                 if (!customer) return [3 /*break*/, 3];
                 return [4 /*yield*/, models_1.Customer.findById(customer._id)];
             case 1:
                 profile = _a.sent();
+                console.log(profile);
                 if (!profile) return [3 /*break*/, 3];
                 if (!(profile.otp === parseInt(otp) && profile.otp_expiry >= new Date())) return [3 /*break*/, 3];
                 profile.verified = true;
@@ -141,7 +138,7 @@ var CustomerVerify = function (req, res, next) { return __awaiter(void 0, void 0
                         email: updatedCustomerResponse.email,
                         verified: updatedCustomerResponse.verified,
                     })];
-            case 3: return [2 /*return*/, res.status(400).json({ msg: 'Unable to verify Customer' })];
+            case 3: return [2 /*return*/, res.status(400).json({ msg: "Unable to verify Customer" })];
         }
     });
 }); };
@@ -181,7 +178,7 @@ var CustomerLogin = function (req, res, next) { return __awaiter(void 0, void 0,
                         })];
                 }
                 _a.label = 4;
-            case 4: return [2 /*return*/, res.json({ msg: 'Error With Signup' })];
+            case 4: return [2 /*return*/, res.json({ msg: "Error With Signup" })];
         }
     });
 }); };
@@ -208,8 +205,8 @@ var RequestOtp = function (req, res, next) { return __awaiter(void 0, void 0, vo
                 _b.sent();
                 return [2 /*return*/, res
                         .status(200)
-                        .json({ message: 'OTP sent to your registered Mobile Number!' })];
-            case 4: return [2 /*return*/, res.status(400).json({ msg: 'Error with Requesting OTP' })];
+                        .json({ message: "OTP sent to your registered Mobile Number!" })];
+            case 4: return [2 /*return*/, res.status(400).json({ msg: "Error with Requesting OTP" })];
         }
     });
 }); };
@@ -228,7 +225,7 @@ var GetCustomerProfile = function (req, res, next) { return __awaiter(void 0, vo
                     return [2 /*return*/, res.status(201).json(profile)];
                 }
                 _a.label = 2;
-            case 2: return [2 /*return*/, res.status(400).json({ msg: 'Error while Fetching Profile' })];
+            case 2: return [2 /*return*/, res.status(400).json({ msg: "Error while Fetching Profile" })];
         }
     });
 }); };
@@ -261,7 +258,7 @@ var EditCustomerProfile = function (req, res, next) { return __awaiter(void 0, v
             case 3:
                 result = _a.sent();
                 return [2 /*return*/, res.status(201).json(result)];
-            case 4: return [2 /*return*/, res.status(400).json({ msg: 'Error while Updating Profile' })];
+            case 4: return [2 /*return*/, res.status(400).json({ msg: "Error while Updating Profile" })];
         }
     });
 }); };
