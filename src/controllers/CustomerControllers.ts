@@ -149,14 +149,15 @@ export const CustomerLogin = async (
     );
 
     if (validation) {
-      const signature = GenerateSignature({
+      const signature: Promise<string> = GenerateSignature({
         _id: customer._id,
         email: customer.email,
         verified: customer.verified,
       });
-
+      console.log(signature);
+      // const signature: Promise<string>
       return res.status(200).json({
-        signature,
+        signature: await signature,
         email: customer.email,
         verified: customer.verified,
       });
