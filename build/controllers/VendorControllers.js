@@ -46,7 +46,7 @@ var VendorLogin = function (req, res, next) { return __awaiter(void 0, void 0, v
         switch (_b.label) {
             case 0:
                 _a = req.body, email = _a.email, password = _a.password;
-                return [4 /*yield*/, (0, AdminController_1.FindVendor)('', email)];
+                return [4 /*yield*/, (0, AdminController_1.FindVendor)("", email)];
             case 1:
                 existingUser = _b.sent();
                 if (!(existingUser !== null)) return [3 /*break*/, 5];
@@ -63,8 +63,8 @@ var VendorLogin = function (req, res, next) { return __awaiter(void 0, void 0, v
             case 3:
                 signature = _b.sent();
                 return [2 /*return*/, res.json(signature)];
-            case 4: return [2 /*return*/, res.json({ messege: 'Password isn not valid' })];
-            case 5: return [2 /*return*/, res.json({ message: 'Login credential is not valid' })];
+            case 4: return [2 /*return*/, res.json({ messege: "Password isn not valid" })];
+            case 5: return [2 /*return*/, res.json({ message: "Login credential is not valid" })];
         }
     });
 }); };
@@ -80,7 +80,7 @@ var GetVendorProfile = function (req, res, next) { return __awaiter(void 0, void
             case 1:
                 existingVendor = _a.sent();
                 return [2 /*return*/, res.json(existingVendor)];
-            case 2: return [2 /*return*/, res.json({ message: 'vendor Information Not Found' })];
+            case 2: return [2 /*return*/, res.json({ message: "vendor Information Not Found" })];
         }
     });
 }); };
@@ -105,7 +105,7 @@ var UpdateVendorProfile = function (req, res, next) { return __awaiter(void 0, v
             case 2:
                 saveResult = _b.sent();
                 return [2 /*return*/, res.json(saveResult)];
-            case 3: return [2 /*return*/, res.json({ message: 'Unable to Update vendor profile ' })];
+            case 3: return [2 /*return*/, res.json({ message: "Unable to Update vendor profile " })];
         }
     });
 }); };
@@ -126,7 +126,7 @@ var UpdateVendorService = function (req, res, next) { return __awaiter(void 0, v
             case 2:
                 saveResult = _a.sent();
                 return [2 /*return*/, res.json(saveResult)];
-            case 3: return [2 /*return*/, res.json({ message: 'Unable to Update vendor profile ' })];
+            case 3: return [2 /*return*/, res.json({ message: "Unable to Update vendor profile " })];
         }
     });
 }); };
@@ -138,6 +138,7 @@ var AddFood = function (req, res, next) { return __awaiter(void 0, void 0, void 
             case 0:
                 user = req.user;
                 _a = req.body, name = _a.name, description = _a.description, category = _a.category, foodType = _a.foodType, readyTime = _a.readyTime, price = _a.price;
+                console.log(name, description, category, foodType, readyTime, price);
                 if (!user) return [3 /*break*/, 4];
                 return [4 /*yield*/, (0, AdminController_1.FindVendor)(user._id)];
             case 1:
@@ -164,7 +165,7 @@ var AddFood = function (req, res, next) { return __awaiter(void 0, void 0, void 
             case 3:
                 result = _b.sent();
                 return [2 /*return*/, res.json(result)];
-            case 4: return [2 /*return*/, res.json({ message: 'Unable to Update vendor profile ' })];
+            case 4: return [2 /*return*/, res.json({ message: "Unable to Update vendor profile " })];
         }
     });
 }); };
@@ -183,14 +184,14 @@ var UpdateVendorCoverImage = function (req, res, next) { return __awaiter(void 0
                 if (!(vendor !== null)) return [3 /*break*/, 3];
                 files = req.files;
                 images = files.map(function (file) { return file.filename; });
-                console.log('runing----------');
+                console.log("runing----------");
                 console.log(files);
                 (_a = vendor.coverImages).push.apply(_a, images);
                 return [4 /*yield*/, vendor.save()];
             case 2:
                 saveResult = _b.sent();
                 return [2 /*return*/, res.json(saveResult)];
-            case 3: return [2 /*return*/, res.json({ message: 'Unable to Update vendor profile ' })];
+            case 3: return [2 /*return*/, res.json({ message: "Unable to Update vendor profile " })];
         }
     });
 }); };
@@ -209,7 +210,7 @@ var GetFoods = function (req, res, next) { return __awaiter(void 0, void 0, void
                     return [2 /*return*/, res.json(foods)];
                 }
                 _a.label = 2;
-            case 2: return [2 /*return*/, res.json({ message: 'Foods not found!' })];
+            case 2: return [2 /*return*/, res.json({ message: "Foods not found!" })];
         }
     });
 }); };

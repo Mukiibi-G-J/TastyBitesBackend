@@ -7,16 +7,22 @@ exports.VandorRoute = void 0;
 var express_1 = __importDefault(require("express"));
 var multer_1 = __importDefault(require("multer"));
 // const multer = require('multer');
+var fs_1 = __importDefault(require("fs"));
 var controllers_1 = require("../controllers");
 var middlewares_1 = require("../middlewares");
 var router = express_1.default.Router();
 exports.VandorRoute = router;
 var imageStorage = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, '');
+        // create folderimages if not exist
+        // how to create folder if not exist?
+        if (!fs_1.default.existsSync('src/images')) {
+            fs_1.default.mkdirSync('src/images');
+        }
+        cb(null, 'src/images');
     },
     filename: function (req, file, cb) {
-        cb(null, new Date().toISOString() + '_' + file.originalname);
+        cb(null, new Date().toISOString().replace(/-/g, '_').replace(/:/g, '_') + file.originalname);
     },
 });
 var images = (0, multer_1.default)({ storage: imageStorage }).array('images', 10);

@@ -52,17 +52,18 @@ var onRequestOTP = function (otp, toPhoneNumber) { return __awaiter(void 0, void
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                accountSid = 'ACbff1380e775c8f5ad5235e4086fbe6f4';
-                authToken = 'bcf03a420efb494b368895395bb26bb8';
+                accountSid = 'AC9899da24d5b233a878300d22477377ef';
+                authToken = '39a7263ba15d75b94e3830eb531ea7f2';
                 client = require('twilio')(accountSid, authToken);
                 return [4 /*yield*/, client.messages.create({
                         body: "Your OTP is ".concat(otp),
                         // from: 'Your TWILIO PHONE NUMBER YOU CAN GET IT FROM YOUR DASHBOARD',
-                        from: '+12183068413',
+                        from: '+19292983736',
                         to: "+256".concat(toPhoneNumber), // recipient phone number // Add country before the number
                     })];
             case 1:
                 response = _a.sent();
+                console.log(response);
                 return [2 /*return*/, response];
         }
     });
