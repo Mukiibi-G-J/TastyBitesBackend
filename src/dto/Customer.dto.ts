@@ -9,6 +9,12 @@ export class CreateCustomerInput {
 
   @Length(6, 12)
   password: string;
+  
+  @Length(3, 24)
+  firstName:string;
+
+  @Length(3, 24)
+  lastName:string;
 }
 
 export class UserLoginInput {

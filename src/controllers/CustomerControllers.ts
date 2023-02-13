@@ -16,7 +16,6 @@ import {
   ValidatePassword,
 } from "../utils";
 
-
 export const CustomerSignUp = async (
   req: Request,
   res: Response,
@@ -32,7 +31,7 @@ export const CustomerSignUp = async (
     return res.status(400).json(validationError);
   }
 
-  const { email, phone, password } = customerInputs;
+  const { email, phone, password, firstName, lastName } = customerInputs;
 
   const salt = await GenerateSalt();
   const userPassword = await GeneratePassword(password, salt);
@@ -40,7 +39,7 @@ export const CustomerSignUp = async (
   const { otp, expiry } = GenerateOtp();
 
   const existingCustomer = await Customer.find({ email: email });
-  console.log(existingCustomer);
+
   // ?  console.log(otp, expiry);
   // ?  return res.json('workking .........');
   // };
@@ -56,8 +55,8 @@ export const CustomerSignUp = async (
     phone: phone,
     otp: otp,
     otp_expiry: expiry,
-    firstName: "",
-    lastName: "",
+    firstName: firstName,
+    lastName: lastName,
     address: "",
     verified: false,
     lat: 0,
@@ -81,7 +80,7 @@ export const CustomerSignUp = async (
       .status(201)
       .json({ signature, verified: result.verified, email: result.email });
   }
-
+  console.log(email, phone, password, firstName, lastName);
   return res.status(400).json({ msg: "Error while creating user" });
 };
 
@@ -149,18 +148,24 @@ export const CustomerLogin = async (
     );
 
     if (validation) {
-      const signature: Promise<string> = GenerateSignature({
-        _id: customer._id,
-        email: customer.email,
-        verified: customer.verified,
-      });
-      console.log(signature);
+      if (customer.verified) {
+        const signature: Promise<string> = GenerateSignature({
+          _id: customer._id,
+          email: customer.email,
+          verified: customer.verified,
+        });
+        return res.status(200).json({
+          signature,
+          email: customer.email,
+          verified: customer.verified,
+          firstName: customer.firstName,
+          lastName: customer.lastName,
+        });
+      } else {
+        return res.status(400).json({ msg: "Please Verify your account" });
+      }
+
       // const signature: Promise<string>
-      return res.status(200).json({
-        signature: await signature,
-        email: customer.email,
-        verified: customer.verified,
-      });
     }
   }
 

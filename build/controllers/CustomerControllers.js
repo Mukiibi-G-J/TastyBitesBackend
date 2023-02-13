@@ -43,7 +43,7 @@ var dto_1 = require("../dto");
 var models_1 = require("../models");
 var utils_1 = require("../utils");
 var CustomerSignUp = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var customerInputs, validationError, email, phone, password, salt, userPassword, _a, otp, expiry, existingCustomer, result, signature;
+    var customerInputs, validationError, email, phone, password, firstName, lastName, salt, userPassword, _a, otp, expiry, existingCustomer, result, signature;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -56,7 +56,7 @@ var CustomerSignUp = function (req, res, next) { return __awaiter(void 0, void 0
                 if (validationError.length > 0) {
                     return [2 /*return*/, res.status(400).json(validationError)];
                 }
-                email = customerInputs.email, phone = customerInputs.phone, password = customerInputs.password;
+                email = customerInputs.email, phone = customerInputs.phone, password = customerInputs.password, firstName = customerInputs.firstName, lastName = customerInputs.lastName;
                 return [4 /*yield*/, (0, utils_1.GenerateSalt)()];
             case 2:
                 salt = _b.sent();
@@ -67,7 +67,6 @@ var CustomerSignUp = function (req, res, next) { return __awaiter(void 0, void 0
                 return [4 /*yield*/, models_1.Customer.find({ email: email })];
             case 4:
                 existingCustomer = _b.sent();
-                console.log(existingCustomer);
                 // ?  console.log(otp, expiry);
                 // ?  return res.json('workking .........');
                 // };
@@ -82,8 +81,8 @@ var CustomerSignUp = function (req, res, next) { return __awaiter(void 0, void 0
                         phone: phone,
                         otp: otp,
                         otp_expiry: expiry,
-                        firstName: "",
-                        lastName: "",
+                        firstName: firstName,
+                        lastName: lastName,
                         address: "",
                         verified: false,
                         lat: 0,
@@ -104,7 +103,9 @@ var CustomerSignUp = function (req, res, next) { return __awaiter(void 0, void 0
                 return [2 /*return*/, res
                         .status(201)
                         .json({ signature: signature, verified: result.verified, email: result.email })];
-            case 7: return [2 /*return*/, res.status(400).json({ msg: "Error while creating user" })];
+            case 7:
+                console.log(email, phone, password, firstName, lastName);
+                return [2 /*return*/, res.status(400).json({ msg: "Error while creating user" })];
         }
     });
 }); };
@@ -144,45 +145,49 @@ var CustomerVerify = function (req, res, next) { return __awaiter(void 0, void 0
 }); };
 exports.CustomerVerify = CustomerVerify;
 var CustomerLogin = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var customerInputs, validationError, email, password, customer, validation, signature, _a, _b;
-    var _c;
-    return __generator(this, function (_d) {
-        switch (_d.label) {
+    var customerInputs, validationError, email, password, customer, validation, signature;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
             case 0:
                 customerInputs = (0, class_transformer_1.plainToClass)(dto_1.UserLoginInput, req.body);
                 return [4 /*yield*/, (0, class_validator_1.validate)(customerInputs, {
                         validationError: { target: true },
                     })];
             case 1:
-                validationError = _d.sent();
+                validationError = _a.sent();
                 if (validationError.length > 0) {
                     return [2 /*return*/, res.status(400).json(validationError)];
                 }
                 email = customerInputs.email, password = customerInputs.password;
                 return [4 /*yield*/, models_1.Customer.findOne({ email: email })];
             case 2:
-                customer = _d.sent();
-                if (!customer) return [3 /*break*/, 5];
+                customer = _a.sent();
+                if (!customer) return [3 /*break*/, 4];
                 return [4 /*yield*/, (0, utils_1.ValidatePassword)(password, customer.password, customer.salt)];
             case 3:
-                validation = _d.sent();
-                if (!validation) return [3 /*break*/, 5];
-                signature = (0, utils_1.GenerateSignature)({
-                    _id: customer._id,
-                    email: customer.email,
-                    verified: customer.verified,
-                });
-                console.log(signature);
-                _b = (_a = res.status(200)).json;
-                _c = {};
-                return [4 /*yield*/, signature];
-            case 4: 
-            // const signature: Promise<string>
-            return [2 /*return*/, _b.apply(_a, [(_c.signature = _d.sent(),
-                        _c.email = customer.email,
-                        _c.verified = customer.verified,
-                        _c)])];
-            case 5: return [2 /*return*/, res.json({ msg: "Error With Signup" })];
+                validation = _a.sent();
+                if (validation) {
+                    if (customer.verified) {
+                        signature = (0, utils_1.GenerateSignature)({
+                            _id: customer._id,
+                            email: customer.email,
+                            verified: customer.verified,
+                        });
+                        return [2 /*return*/, res.status(200).json({
+                                signature: signature,
+                                email: customer.email,
+                                verified: customer.verified,
+                                firstName: customer.firstName,
+                                lastName: customer.lastName,
+                            })];
+                    }
+                    else {
+                        return [2 /*return*/, res.status(400).json({ msg: "Please Verify your account" })];
+                    }
+                    // const signature: Promise<string>
+                }
+                _a.label = 4;
+            case 4: return [2 /*return*/, res.json({ msg: "Error With Signup" })];
         }
     });
 }); };

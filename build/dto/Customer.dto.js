@@ -26,6 +26,14 @@ var CreateCustomerInput = /** @class */ (function () {
         (0, class_validator_1.Length)(6, 12),
         __metadata("design:type", String)
     ], CreateCustomerInput.prototype, "password", void 0);
+    __decorate([
+        (0, class_validator_1.Length)(3, 24),
+        __metadata("design:type", String)
+    ], CreateCustomerInput.prototype, "firstName", void 0);
+    __decorate([
+        (0, class_validator_1.Length)(3, 24),
+        __metadata("design:type", String)
+    ], CreateCustomerInput.prototype, "lastName", void 0);
     return CreateCustomerInput;
 }());
 exports.CreateCustomerInput = CreateCustomerInput;
