@@ -73,7 +73,7 @@ var ValidatePassword = function (enteredPassword, savedPassword, salt) { return 
 exports.ValidatePassword = ValidatePassword;
 var GenerateSignature = function (payload) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        return [2 /*return*/, jsonwebtoken_1.default.sign(payload, config_1.APP_SECRET, { expiresIn: '90d' })];
+        return [2 /*return*/, jsonwebtoken_1.default.sign(payload, config_1.APP_SECRET, { expiresIn: "90d" })];
     });
 }); };
 exports.GenerateSignature = GenerateSignature;
@@ -82,9 +82,9 @@ var ValidateSignature = function (req) { return __awaiter(void 0, void 0, void 0
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                signature = req.get('Authorization');
+                signature = req.get("Authorization");
                 if (!signature) return [3 /*break*/, 2];
-                return [4 /*yield*/, jsonwebtoken_1.default.verify(signature.split(' ')[1], config_1.APP_SECRET
+                return [4 /*yield*/, jsonwebtoken_1.default.verify(signature.split(" ")[1], config_1.APP_SECRET
                     //? this is called cassting
                     )];
             case 1:

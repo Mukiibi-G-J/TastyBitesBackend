@@ -6,6 +6,7 @@ import {
   GetTopRestaurants,
   RestaurantById,
   SearchFoods,
+  GetAllRestaurants
 } from '../controllers';
 
 const router = express.Router();
@@ -15,6 +16,10 @@ router.get('/:pincode', GetFoodAvailability);
 
 /* ------------------- Top Restaurant --------------------- */
 router.get('/top-restaurant/:pincode', GetTopRestaurants);
+
+
+/* ------------------- ALL Restaurants --------------------- */
+router.get('/all-restaurants/:pincode', GetAllRestaurants);
 
 /* ------------------- Food Available in 30 Minutes --------------------- */
 router.get('/foods-in-30-min/:pincode', GetFoodsIn30Min);

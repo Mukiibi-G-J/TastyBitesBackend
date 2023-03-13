@@ -40,7 +40,7 @@ export const CustomerSignUp = async (
 
   const existingCustomer = await Customer.find({ email: email });
 
-  // ?  console.log(otp, expiry);
+  console.log(otp, expiry);
   // ?  return res.json('workking .........');
   // };
   // if (existingCustomer !== null)
@@ -91,18 +91,18 @@ export const CustomerVerify = async (
 ) => {
   const { otp } = req.body;
   const customer = req.user;
-  console.log(otp);
+  // console.log(otp);
 
   if (customer) {
     const profile = await Customer.findById(customer._id);
-    console.log(profile);
+    // console.log(profile);
     if (profile) {
       if (profile.otp === parseInt(otp) && profile.otp_expiry >= new Date()) {
         profile.verified = true;
 
         const updatedCustomerResponse = await profile.save();
 
-        const signature = GenerateSignature({
+        const signature = await GenerateSignature({
           _id: updatedCustomerResponse._id,
           email: updatedCustomerResponse.email,
           verified: updatedCustomerResponse.verified,
@@ -112,6 +112,8 @@ export const CustomerVerify = async (
           signature,
           email: updatedCustomerResponse.email,
           verified: updatedCustomerResponse.verified,
+          firstName: updatedCustomerResponse.firstName,
+          lastName: updatedCustomerResponse.lastName,
         });
       }
     }
@@ -149,13 +151,14 @@ export const CustomerLogin = async (
 
     if (validation) {
       if (customer.verified) {
-        const signature: Promise<string> = GenerateSignature({
+        const signature = await GenerateSignature({
           _id: customer._id,
           email: customer.email,
           verified: customer.verified,
         });
+        console.log(signature);
         return res.status(200).json({
-          signature,
+          signature: signature,
           email: customer.email,
           verified: customer.verified,
           firstName: customer.firstName,

@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from "express";
 import { FindVendor } from "./AdminController";
 import { GenerateSignature, ValidatePassword } from "../utils";
 import { Food } from "../models";
+const cloudinary = require("cloudinary").v2;
 
 export const VendorLogin = async (
   req: Request,
@@ -10,6 +11,7 @@ export const VendorLogin = async (
   next: NextFunction
 ) => {
   const { email, password } = <VendorLoginInput>req.body;
+  console.log(email)
   const existingUser = await FindVendor("", email);
   if (existingUser !== null) {
     const validation = await ValidatePassword(
@@ -91,7 +93,7 @@ export const UpdateVendorService = async (
 };
 
 export const AddFood = async (
-  req: Request, 
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
@@ -99,13 +101,24 @@ export const AddFood = async (
   const { name, description, category, foodType, readyTime, price } = <
     CreateFoodInput
   >req.body;
-  console.log(name, description, category, foodType, readyTime, price);
+
   if (user) {
     const vendor = await FindVendor(user._id);
 
     if (vendor !== null) {
       const files = req.files as [Express.Multer.File];
-      const images = files.map((file: Express.Multer.File) => file.filename);
+      const filename = files[0].filename;
+      cloudinary.config({
+        cloud_name: "dbyhl9rtv",
+        api_key: "329463643862855",
+        api_secret: "FAw4lp5EGACZs4kO00Opx7UJNZE",
+      });
+
+      const result_img = await cloudinary.uploader.upload(files[0].path, {
+        public_id:`${filename}`,
+      });
+
+      console.log(result_img);
 
       const food = await Food.create({
         vendorId: vendor._id,
@@ -116,12 +129,13 @@ export const AddFood = async (
         rating: 0,
         readyTime: readyTime,
         foodType: foodType,
-        images: images,
+        images: result_img.secure_url,
       });
       //! updating the vendor with the new food created
       vendor.foods.push(food._id);
 
       const result = await vendor.save();
+
       return res.json(result);
     }
   }
@@ -141,9 +155,20 @@ export const UpdateVendorCoverImage = async (
     if (vendor !== null) {
       const files = req.files as [Express.Multer.File];
 
-      const images = files.map((file: Express.Multer.File) => file.filename);
-      console.log("runing----------");
-      console.log(files);
+      // const images = files.map((file: Express.Multer.File) => file.filename);
+      const filename = files[0].filename;
+      cloudinary.config({
+        cloud_name: "dbyhl9rtv",
+        api_key: "329463643862855",
+        api_secret: "FAw4lp5EGACZs4kO00Opx7UJNZE",
+      });
+
+      const result_img = await cloudinary.uploader.upload(files[0].path, {
+        public_id:`${filename}`,
+      });
+      const images = [result_img.secure_url]
+
+      
       vendor.coverImages.push(...images);
 
       const saveResult = await vendor.save();
@@ -160,12 +185,15 @@ export const GetFoods = async (
   next: NextFunction
 ) => {
   const user = req.user;
-
+  
   if (user) {
     const foods = await Food.find({ vendorId: user._id });
 
     if (foods !== null) {
       return res.json(foods);
+    }
+    else{
+      return res.json({message:"No food found"})
     }
   }
   return res.json({ message: "Foods not found!" });

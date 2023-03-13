@@ -67,7 +67,7 @@ var CustomerSignUp = function (req, res, next) { return __awaiter(void 0, void 0
                 return [4 /*yield*/, models_1.Customer.find({ email: email })];
             case 4:
                 existingCustomer = _b.sent();
-                // ?  console.log(otp, expiry);
+                console.log(otp, expiry);
                 // ?  return res.json('workking .........');
                 // };
                 // if (existingCustomer !== null)
@@ -117,29 +117,31 @@ var CustomerVerify = function (req, res, next) { return __awaiter(void 0, void 0
             case 0:
                 otp = req.body.otp;
                 customer = req.user;
-                console.log(otp);
-                if (!customer) return [3 /*break*/, 3];
+                if (!customer) return [3 /*break*/, 4];
                 return [4 /*yield*/, models_1.Customer.findById(customer._id)];
             case 1:
                 profile = _a.sent();
-                console.log(profile);
-                if (!profile) return [3 /*break*/, 3];
-                if (!(profile.otp === parseInt(otp) && profile.otp_expiry >= new Date())) return [3 /*break*/, 3];
+                if (!profile) return [3 /*break*/, 4];
+                if (!(profile.otp === parseInt(otp) && profile.otp_expiry >= new Date())) return [3 /*break*/, 4];
                 profile.verified = true;
                 return [4 /*yield*/, profile.save()];
             case 2:
                 updatedCustomerResponse = _a.sent();
-                signature = (0, utils_1.GenerateSignature)({
-                    _id: updatedCustomerResponse._id,
-                    email: updatedCustomerResponse.email,
-                    verified: updatedCustomerResponse.verified,
-                });
+                return [4 /*yield*/, (0, utils_1.GenerateSignature)({
+                        _id: updatedCustomerResponse._id,
+                        email: updatedCustomerResponse.email,
+                        verified: updatedCustomerResponse.verified,
+                    })];
+            case 3:
+                signature = _a.sent();
                 return [2 /*return*/, res.status(200).json({
                         signature: signature,
                         email: updatedCustomerResponse.email,
                         verified: updatedCustomerResponse.verified,
+                        firstName: updatedCustomerResponse.firstName,
+                        lastName: updatedCustomerResponse.lastName,
                     })];
-            case 3: return [2 /*return*/, res.status(400).json({ msg: "Unable to verify Customer" })];
+            case 4: return [2 /*return*/, res.status(400).json({ msg: "Unable to verify Customer" })];
         }
     });
 }); };
@@ -162,32 +164,29 @@ var CustomerLogin = function (req, res, next) { return __awaiter(void 0, void 0,
                 return [4 /*yield*/, models_1.Customer.findOne({ email: email })];
             case 2:
                 customer = _a.sent();
-                if (!customer) return [3 /*break*/, 4];
+                if (!customer) return [3 /*break*/, 6];
                 return [4 /*yield*/, (0, utils_1.ValidatePassword)(password, customer.password, customer.salt)];
             case 3:
                 validation = _a.sent();
-                if (validation) {
-                    if (customer.verified) {
-                        signature = (0, utils_1.GenerateSignature)({
-                            _id: customer._id,
-                            email: customer.email,
-                            verified: customer.verified,
-                        });
-                        return [2 /*return*/, res.status(200).json({
-                                signature: signature,
-                                email: customer.email,
-                                verified: customer.verified,
-                                firstName: customer.firstName,
-                                lastName: customer.lastName,
-                            })];
-                    }
-                    else {
-                        return [2 /*return*/, res.status(400).json({ msg: "Please Verify your account" })];
-                    }
-                    // const signature: Promise<string>
-                }
-                _a.label = 4;
-            case 4: return [2 /*return*/, res.json({ msg: "Error With Signup" })];
+                if (!validation) return [3 /*break*/, 6];
+                if (!customer.verified) return [3 /*break*/, 5];
+                return [4 /*yield*/, (0, utils_1.GenerateSignature)({
+                        _id: customer._id,
+                        email: customer.email,
+                        verified: customer.verified,
+                    })];
+            case 4:
+                signature = _a.sent();
+                console.log(signature);
+                return [2 /*return*/, res.status(200).json({
+                        signature: signature,
+                        email: customer.email,
+                        verified: customer.verified,
+                        firstName: customer.firstName,
+                        lastName: customer.lastName,
+                    })];
+            case 5: return [2 /*return*/, res.status(400).json({ msg: "Please Verify your account" })];
+            case 6: return [2 /*return*/, res.json({ msg: "Error With Signup" })];
         }
     });
 }); };

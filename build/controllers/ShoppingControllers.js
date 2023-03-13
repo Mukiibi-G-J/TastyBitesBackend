@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RestaurantById = exports.SearchFoods = exports.GetFoodsIn30Min = exports.GetTopRestaurants = exports.GetFoodAvailability = void 0;
+exports.RestaurantById = exports.SearchFoods = exports.GetFoodsIn30Min = exports.GetAllRestaurants = exports.GetTopRestaurants = exports.GetFoodAvailability = void 0;
 var models_1 = require("../models");
 var GetFoodAvailability = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
     var pincode, result;
@@ -49,13 +49,13 @@ var GetFoodAvailability = function (req, res, next) { return __awaiter(void 0, v
                         serviceAvailable: false,
                     })
                         // .sort([['rating', 'descending']])
-                        .populate('foods')];
+                        .populate("foods")];
             case 1:
                 result = _a.sent();
                 if (result.length > 0) {
                     return [2 /*return*/, res.status(200).json(result)];
                 }
-                return [2 /*return*/, res.status(404).json({ msg: 'data Not found!' })];
+                return [2 /*return*/, res.status(404).json({ msg: "data Not found!" })];
         }
     });
 }); };
@@ -77,11 +77,26 @@ var GetTopRestaurants = function (req, res, next) { return __awaiter(void 0, voi
                 if (result.length > 0) {
                     return [2 /*return*/, res.status(200).json(result)];
                 }
-                return [2 /*return*/, res.status(404).json({ msg: 'data Not found!' })];
+                return [2 /*return*/, res.status(404).json({ msg: "data Not found!" })];
         }
     });
 }); };
 exports.GetTopRestaurants = GetTopRestaurants;
+var GetAllRestaurants = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var result;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, models_1.Vendor.find().populate("foods")];
+            case 1:
+                result = _a.sent();
+                if (result.length > 0) {
+                    return [2 /*return*/, res.status(200).json(result)];
+                }
+                return [2 /*return*/, res.status(404).json({ msg: "data Not found!" })];
+        }
+    });
+}); };
+exports.GetAllRestaurants = GetAllRestaurants;
 var GetFoodsIn30Min = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
     var pincode, result, foodResult_1;
     return __generator(this, function (_a) {
@@ -93,7 +108,7 @@ var GetFoodsIn30Min = function (req, res, next) { return __awaiter(void 0, void 
                         serviceAvailable: false,
                     })
                         // .sort([['rating', 'descending']])
-                        .populate('foods')];
+                        .populate("foods")];
             case 1:
                 result = _a.sent();
                 if (result.length > 0) {
@@ -104,7 +119,7 @@ var GetFoodsIn30Min = function (req, res, next) { return __awaiter(void 0, void 
                     });
                     return [2 /*return*/, res.status(200).json(foodResult_1)];
                 }
-                return [2 /*return*/, res.status(404).json({ msg: 'data Not found!' })];
+                return [2 /*return*/, res.status(404).json({ msg: "data Not found!" })];
         }
     });
 }); };
@@ -118,7 +133,7 @@ var SearchFoods = function (req, res, next) { return __awaiter(void 0, void 0, v
                 return [4 /*yield*/, models_1.Vendor.find({
                         pincode: pincode,
                         serviceAvailable: false,
-                    }).populate('foods')];
+                    }).populate("foods")];
             case 1:
                 result = _a.sent();
                 if (result.length > 0) {
@@ -126,7 +141,7 @@ var SearchFoods = function (req, res, next) { return __awaiter(void 0, void 0, v
                     result.map(function (item) { return foodResult_2.push.apply(foodResult_2, item.foods); });
                     return [2 /*return*/, res.status(200).json(foodResult_2)];
                 }
-                return [2 /*return*/, res.status(404).json({ msg: 'data Not found!' })];
+                return [2 /*return*/, res.status(404).json({ msg: "data Not found!" })];
         }
     });
 }); };
@@ -137,13 +152,13 @@ var RestaurantById = function (req, res, next) { return __awaiter(void 0, void 0
         switch (_a.label) {
             case 0:
                 id = req.params.id;
-                return [4 /*yield*/, models_1.Vendor.findById(id).populate('foods')];
+                return [4 /*yield*/, models_1.Vendor.findById(id).populate("foods")];
             case 1:
                 result = _a.sent();
                 if (result) {
                     return [2 /*return*/, res.status(200).json(result)];
                 }
-                return [2 /*return*/, res.status(404).json({ msg: 'data Not found!' })];
+                return [2 /*return*/, res.status(404).json({ msg: "data Not found!" })];
         }
     });
 }); };

@@ -1,6 +1,6 @@
-import { Request, NextFunction, Response } from 'express';
-import { AuthPayload } from '../dto';
-import { ValidateSignature } from '../utils';
+import { Request, NextFunction, Response } from "express";
+import { AuthPayload } from "../dto";
+import { ValidateSignature } from "../utils";
 
 declare global {
   namespace Express {
@@ -16,10 +16,10 @@ export const Authenticate = async (
   next: NextFunction
 ) => {
   const signature = await ValidateSignature(req);
-  console.log(signature)
+  console.log(signature);
   if (signature) {
     return next();
   } else {
-    return res.json({ message: 'User Not authorised' });
+    return res.json({ message: "User Not authorised" });
   }
 };

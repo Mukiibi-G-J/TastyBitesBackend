@@ -40,18 +40,28 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var routes_1 = require("../routes");
+var cors_1 = __importDefault(require("cors"));
 var path_1 = __importDefault(require("path"));
 var express_1 = __importDefault(require("express"));
+// const cors = require('cors');
 exports.default = (function (app) { return __awaiter(void 0, void 0, void 0, function () {
+    var imagePath;
     return __generator(this, function (_a) {
-        app.use(express_1.default.json({ limit: '30mb' }));
+        app.use(express_1.default.json({ limit: "30mb" }));
         app.use(express_1.default.urlencoded({ extended: true }));
-        // const imagePath = path.join(__dirname, '../images');
-        app.use('/images', express_1.default.static(path_1.default.join(__dirname, 'images')));
-        app.use('/admin', routes_1.AdminRoute);
-        app.use('/vandor', routes_1.VandorRoute);
-        app.use('/customer', routes_1.CustomerRoute);
-        app.use(routes_1.ShoppingRoute);
+        imagePath = path_1.default.join(__dirname, "../images");
+        console.log(imagePath);
+        app.use("/images", express_1.default.static("../images"));
+        app.use((0, cors_1.default)({
+            origin: "*",
+        }));
+        // app.get("/images", function(request, response) {
+        //   response.render("image");
+        //  });
+        app.use("/admin", routes_1.AdminRoute);
+        app.use("/vandor", routes_1.VandorRoute);
+        app.use("/customer", routes_1.CustomerRoute);
+        app.use("/shopping", routes_1.ShoppingRoute);
         return [2 /*return*/];
     });
 }); });

@@ -40,12 +40,14 @@ exports.GetFoods = exports.UpdateVendorCoverImage = exports.AddFood = exports.Up
 var AdminController_1 = require("./AdminController");
 var utils_1 = require("../utils");
 var models_1 = require("../models");
+var cloudinary = require("cloudinary").v2;
 var VendorLogin = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, email, password, existingUser, validation, signature;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
                 _a = req.body, email = _a.email, password = _a.password;
+                console.log(email);
                 return [4 /*yield*/, (0, AdminController_1.FindVendor)("", email)];
             case 1:
                 existingUser = _b.sent();
@@ -132,20 +134,30 @@ var UpdateVendorService = function (req, res, next) { return __awaiter(void 0, v
 }); };
 exports.UpdateVendorService = UpdateVendorService;
 var AddFood = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var user, _a, name, description, category, foodType, readyTime, price, vendor, files, images, food, result;
+    var user, _a, name, description, category, foodType, readyTime, price, vendor, files, filename, result_img, food, result;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
                 user = req.user;
                 _a = req.body, name = _a.name, description = _a.description, category = _a.category, foodType = _a.foodType, readyTime = _a.readyTime, price = _a.price;
-                console.log(name, description, category, foodType, readyTime, price);
-                if (!user) return [3 /*break*/, 4];
+                if (!user) return [3 /*break*/, 5];
                 return [4 /*yield*/, (0, AdminController_1.FindVendor)(user._id)];
             case 1:
                 vendor = _b.sent();
-                if (!(vendor !== null)) return [3 /*break*/, 4];
+                if (!(vendor !== null)) return [3 /*break*/, 5];
                 files = req.files;
-                images = files.map(function (file) { return file.filename; });
+                filename = files[0].filename;
+                cloudinary.config({
+                    cloud_name: "dbyhl9rtv",
+                    api_key: "329463643862855",
+                    api_secret: "FAw4lp5EGACZs4kO00Opx7UJNZE",
+                });
+                return [4 /*yield*/, cloudinary.uploader.upload(files[0].path, {
+                        public_id: "".concat(filename),
+                    })];
+            case 2:
+                result_img = _b.sent();
+                console.log(result_img);
                 return [4 /*yield*/, models_1.Food.create({
                         vendorId: vendor._id,
                         name: name,
@@ -155,43 +167,52 @@ var AddFood = function (req, res, next) { return __awaiter(void 0, void 0, void 
                         rating: 0,
                         readyTime: readyTime,
                         foodType: foodType,
-                        images: images,
+                        images: result_img.secure_url,
                     })];
-            case 2:
+            case 3:
                 food = _b.sent();
                 //! updating the vendor with the new food created
                 vendor.foods.push(food._id);
                 return [4 /*yield*/, vendor.save()];
-            case 3:
+            case 4:
                 result = _b.sent();
                 return [2 /*return*/, res.json(result)];
-            case 4: return [2 /*return*/, res.json({ message: "Unable to Update vendor profile " })];
+            case 5: return [2 /*return*/, res.json({ message: "Unable to Update vendor profile " })];
         }
     });
 }); };
 exports.AddFood = AddFood;
 var UpdateVendorCoverImage = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var user, vendor, files, images, saveResult;
+    var user, vendor, files, filename, result_img, images, saveResult;
     var _a;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
                 user = req.user;
-                if (!user) return [3 /*break*/, 3];
+                if (!user) return [3 /*break*/, 4];
                 return [4 /*yield*/, (0, AdminController_1.FindVendor)(user._id)];
             case 1:
                 vendor = _b.sent();
-                if (!(vendor !== null)) return [3 /*break*/, 3];
+                if (!(vendor !== null)) return [3 /*break*/, 4];
                 files = req.files;
-                images = files.map(function (file) { return file.filename; });
-                console.log("runing----------");
-                console.log(files);
+                filename = files[0].filename;
+                cloudinary.config({
+                    cloud_name: "dbyhl9rtv",
+                    api_key: "329463643862855",
+                    api_secret: "FAw4lp5EGACZs4kO00Opx7UJNZE",
+                });
+                return [4 /*yield*/, cloudinary.uploader.upload(files[0].path, {
+                        public_id: "".concat(filename),
+                    })];
+            case 2:
+                result_img = _b.sent();
+                images = [result_img.secure_url];
                 (_a = vendor.coverImages).push.apply(_a, images);
                 return [4 /*yield*/, vendor.save()];
-            case 2:
+            case 3:
                 saveResult = _b.sent();
                 return [2 /*return*/, res.json(saveResult)];
-            case 3: return [2 /*return*/, res.json({ message: "Unable to Update vendor profile " })];
+            case 4: return [2 /*return*/, res.json({ message: "Unable to Update vendor profile " })];
         }
     });
 }); };

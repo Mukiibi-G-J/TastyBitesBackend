@@ -12,6 +12,8 @@ exports.ShoppingRoute = router;
 router.get('/:pincode', controllers_1.GetFoodAvailability);
 /* ------------------- Top Restaurant --------------------- */
 router.get('/top-restaurant/:pincode', controllers_1.GetTopRestaurants);
+/* ------------------- ALL Restaurants --------------------- */
+router.get('/all-restaurants/:pincode', controllers_1.GetAllRestaurants);
 /* ------------------- Food Available in 30 Minutes --------------------- */
 router.get('/foods-in-30-min/:pincode', controllers_1.GetFoodsIn30Min);
 /* ------------------- Search Foods --------------------- */
