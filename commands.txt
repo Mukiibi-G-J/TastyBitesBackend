@@ -1,0 +1,20 @@
+npm init -y
+tsc --init
+npm install express nodemon body-parser cors ts-node-dev typescript
+npm install @types/express @types/cors
+npm i bcrypt
+npm i jsonwebtoken @types/jsonwebtoken
+npm i @types/multer
+npm install class-transformer
+npm install class-validator
+npm install twilio
+https://damp-oasis-61328.herokuapp.com/ | https://git.heroku.com/damp-oasis-61328.git
+heroku login
+heroku create
+git push heroku
+https://food-online-production-backend.herokuapp.com/
+
+ "dev": "nodemon src/index.ts",
+    "start": "node src/index.ts",
+    // "build": "tsc -p .",
+    // "postinstall": "npm run build"
