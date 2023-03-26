@@ -6,7 +6,9 @@ import {
   GetTopRestaurants,
   RestaurantById,
   SearchFoods,
-  GetAllRestaurants
+  GetAllRestaurants,
+  RestaurantByName,
+  ConfrimOrder
 } from '../controllers';
 
 const router = express.Router();
@@ -32,5 +34,11 @@ router.get('/search/:pincode', SearchFoods);
 
 /* ------------------- Find Restaurant by ID --------------------- */
 router.get('/restaurant/:id', RestaurantById);
+ 
+
+/* ----------------- find by Restaurant Name --------------------- */
+router.get('/restaurant-name/:name', RestaurantByName);
+
+router.post("/confirmorder", ConfrimOrder);
 
 export { router as ShoppingRoute };

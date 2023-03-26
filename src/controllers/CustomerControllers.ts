@@ -6,15 +6,17 @@ import {
   EditCustomerProfileInput,
   UserLoginInput,
 } from "../dto";
-import { Customer } from "../models";
+import { Customer, Food, Vendor } from "../models";
 import {
   GenerateOtp,
   GeneratePassword,
   GenerateSalt,
   GenerateSignature,
   onRequestOTP,
+  sendEmail,
   ValidatePassword,
 } from "../utils";
+import { Order } from "../models/Order";
 
 export const CustomerSignUp = async (
   req: Request,
@@ -39,6 +41,9 @@ export const CustomerSignUp = async (
   const { otp, expiry } = GenerateOtp();
 
   const existingCustomer = await Customer.find({ email: email });
+  const subject = "Tast Bites";
+  // sending mail  to the customer
+  sendEmail(email, subject, otp.toString());
 
   console.log(otp, expiry);
   // ?  return res.json('workking .........');
@@ -71,7 +76,6 @@ export const CustomerSignUp = async (
       ? result.phone.substring(1)
       : result.phone;
 
-    
     await onRequestOTP(otp, phone);
 
     // Generate the Signature
@@ -163,6 +167,7 @@ export const CustomerLogin = async (
         });
         console.log(signature);
         return res.status(200).json({
+          msg: "logined successfully",
           signature: signature,
           email: customer.email,
           verified: customer.verified,
@@ -256,4 +261,44 @@ export const EditCustomerProfile = async (
     }
   }
   return res.status(400).json({ msg: "Error while Updating Profile" });
+};
+export const GetOrdersStatus = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const customer = req.user;
+  if (customer) {
+    const profile = await Customer.findById(customer._id);
+    if (profile) {
+      // find orders where customerid = profile._id
+      const orders = await Order.find({ customerId: profile._id });
+      if (orders) {
+        // use Promise.all() to wait for all the promises to resolve
+        const response = await Promise.all(
+          orders
+          // sort the status  pending, completed, processing
+          .sort((a, b) => ( a.status > b.status ? 1 : -1))
+          .map(async (order) => {
+            // get food name from food id
+            const food = await Food.findById(order.foodId);
+            const vendor = await Vendor.findById(order.vendorId);
+
+            return {
+              _id: order._id,
+              ...order["_doc"],
+              //format the date
+
+              foodName: food.name,
+              vendorName: vendor.name,
+              status: order.status,
+            };
+          })
+        );
+        console.log(response);
+        return res.status(200).json(response);
+      }
+    }
+  }
+  return res.status(400).json({ msg: "Error while Fetching Orders" });
 };

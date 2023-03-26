@@ -1,8 +1,15 @@
-import { CreateFoodInput, EditVendorInput, VendorLoginInput } from "../dto";
+import {
+  CreateFoodInput,
+  EditVendorInput,
+  UpdateOrderInput,
+  VendorLoginInput,
+} from "../dto";
 import { Request, Response, NextFunction } from "express";
 import { FindVendor } from "./AdminController";
 import { GenerateSignature, ValidatePassword } from "../utils";
-import { Food } from "../models";
+import { Customer, Food } from "../models";
+import { Order } from "../models/Order";
+import { couldStartTrivia } from "typescript";
 const cloudinary = require("cloudinary").v2;
 
 export const VendorLogin = async (
@@ -11,7 +18,7 @@ export const VendorLogin = async (
   next: NextFunction
 ) => {
   const { email, password } = <VendorLoginInput>req.body;
-  console.log(email)
+
   const existingUser = await FindVendor("", email);
   if (existingUser !== null) {
     const validation = await ValidatePassword(
@@ -26,7 +33,7 @@ export const VendorLogin = async (
         name: existingUser.name,
         foodType: existingUser.foodType,
       });
-      return res.json(signature);
+      return res.json({ signature: signature, name: existingUser.name });
     } else {
       return res.json({ messege: "Password isn not valid" });
     }
@@ -115,10 +122,10 @@ export const AddFood = async (
       });
 
       const result_img = await cloudinary.uploader.upload(files[0].path, {
-        public_id:`${filename}`,
+        public_id: `${filename}`,
       });
 
-      console.log(result_img);
+      console.log(req);
 
       const food = await Food.create({
         vendorId: vendor._id,
@@ -131,7 +138,7 @@ export const AddFood = async (
         foodType: foodType,
         images: result_img.secure_url,
       });
-      //! updating the vendor with the new food created
+      // //! updating the vendor with the new food created
       vendor.foods.push(food._id);
 
       const result = await vendor.save();
@@ -139,6 +146,7 @@ export const AddFood = async (
       return res.json(result);
     }
   }
+
   return res.json({ message: "Unable to Update vendor profile " });
 };
 
@@ -164,11 +172,10 @@ export const UpdateVendorCoverImage = async (
       });
 
       const result_img = await cloudinary.uploader.upload(files[0].path, {
-        public_id:`${filename}`,
+        public_id: `${filename}`,
       });
-      const images = [result_img.secure_url]
+      const images = [result_img.secure_url];
 
-      
       vendor.coverImages.push(...images);
 
       const saveResult = await vendor.save();
@@ -185,16 +192,75 @@ export const GetFoods = async (
   next: NextFunction
 ) => {
   const user = req.user;
-  
+
   if (user) {
     const foods = await Food.find({ vendorId: user._id });
 
     if (foods !== null) {
       return res.json(foods);
-    }
-    else{
-      return res.json({message:"No food found"})
+    } else {
+      return res.json({ message: "No food found" });
     }
   }
   return res.json({ message: "Foods not found!" });
+};
+
+export const GetOrders = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  // check if it is a put request
+  if (req.method === "PUT") {
+    const { orderId, status } = <UpdateOrderInput>req.body;
+    //? get the order
+    console.log(orderId, status);
+    const orderUpdate = Order.findByIdAndUpdate(
+      orderId,
+      { status: status },
+      { new: true }
+    );
+    if (orderUpdate) {
+      //? save the order
+      await (await orderUpdate).save();
+
+      return res.json({ message: "Order Updated" });
+    }
+  }
+
+  // get all orders for the db
+  const user = req.user;
+  if (user) {
+    const orders = await Order.find({ vendorId: user._id });
+    const responseArray = [];
+
+    for (let i = 0; i < orders.length; i++) {
+      const order = orders[i];
+      const food = await Food.findOne({ _id: order.foodId });
+      const customer = await Customer.findOne({ _id: order.customerId });
+      const firstName = customer ? customer.firstName : "Customer";
+      const lastName = customer ? customer.lastName : "Name";
+      const fullName = firstName + " " + lastName;
+      // const updatedAt = new Date(order.["_doc"].updatedAt); // [order["_doc"].updatedAt
+      // const updated_date = updatedAt.toLocaleString();
+      // const createdAt = new Date(order.createdAt); // [order["_doc"].updatedAt
+      // const created_date = createdAt.toLocaleString();
+
+      responseArray.push({
+        ...order["_doc"],
+        foodName: food.name,
+        customerName: fullName,
+        // createdAt: created_date,
+        // updatedAt: updated_date,
+        // const date = new Date(row.updatedAt); date.toLocaleString()
+      });
+      console.log(i);
+      if (i === orders.length) {
+        break;
+      }
+    }
+
+    // console.log(responseArray);
+    return res.json(responseArray);
+  }
 };
