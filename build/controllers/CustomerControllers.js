@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -36,14 +47,15 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.EditCustomerProfile = exports.GetCustomerProfile = exports.RequestOtp = exports.CustomerLogin = exports.CustomerVerify = exports.CustomerSignUp = void 0;
+exports.GetOrdersStatus = exports.EditCustomerProfile = exports.GetCustomerProfile = exports.RequestOtp = exports.CustomerLogin = exports.CustomerVerify = exports.CustomerSignUp = void 0;
 var class_transformer_1 = require("class-transformer");
 var class_validator_1 = require("class-validator");
 var dto_1 = require("../dto");
 var models_1 = require("../models");
 var utils_1 = require("../utils");
+var Order_1 = require("../models/Order");
 var CustomerSignUp = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var customerInputs, validationError, email, phone, password, firstName, lastName, salt, userPassword, _a, otp, expiry, existingCustomer, result, signature;
+    var customerInputs, validationError, email, phone, password, firstName, lastName, salt, userPassword, _a, otp, expiry, existingCustomer, subject, result, phone_1, signature;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -67,6 +79,9 @@ var CustomerSignUp = function (req, res, next) { return __awaiter(void 0, void 0
                 return [4 /*yield*/, models_1.Customer.find({ email: email })];
             case 4:
                 existingCustomer = _b.sent();
+                subject = "Tast Bites";
+                // sending mail  to the customer
+                (0, utils_1.sendEmail)(email, subject, otp.toString());
                 console.log(otp, expiry);
                 // ?  return res.json('workking .........');
                 // };
@@ -91,19 +106,25 @@ var CustomerSignUp = function (req, res, next) { return __awaiter(void 0, void 0
                     })];
             case 5:
                 result = _b.sent();
-                if (!result) return [3 /*break*/, 7];
+                if (!result) return [3 /*break*/, 8];
+                phone_1 = result.phone.startsWith("0")
+                    ? result.phone.substring(1)
+                    : result.phone;
+                return [4 /*yield*/, (0, utils_1.onRequestOTP)(otp, phone_1)];
+            case 6:
+                _b.sent();
                 return [4 /*yield*/, (0, utils_1.GenerateSignature)({
                         _id: result._id,
                         email: result.email,
                         verified: result.verified,
                     })];
-            case 6:
+            case 7:
                 signature = _b.sent();
                 // Send the result
                 return [2 /*return*/, res
                         .status(201)
                         .json({ signature: signature, verified: result.verified, email: result.email })];
-            case 7:
+            case 8:
                 console.log(email, phone, password, firstName, lastName);
                 return [2 /*return*/, res.status(400).json({ msg: "Error while creating user" })];
         }
@@ -179,6 +200,7 @@ var CustomerLogin = function (req, res, next) { return __awaiter(void 0, void 0,
                 signature = _a.sent();
                 console.log(signature);
                 return [2 /*return*/, res.status(200).json({
+                        msg: "logined successfully",
                         signature: signature,
                         email: customer.email,
                         verified: customer.verified,
@@ -271,4 +293,47 @@ var EditCustomerProfile = function (req, res, next) { return __awaiter(void 0, v
     });
 }); };
 exports.EditCustomerProfile = EditCustomerProfile;
+var GetOrdersStatus = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var customer, profile, orders, response;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                customer = req.user;
+                if (!customer) return [3 /*break*/, 4];
+                return [4 /*yield*/, models_1.Customer.findById(customer._id)];
+            case 1:
+                profile = _a.sent();
+                if (!profile) return [3 /*break*/, 4];
+                return [4 /*yield*/, Order_1.Order.find({ customerId: profile._id })];
+            case 2:
+                orders = _a.sent();
+                if (!orders) return [3 /*break*/, 4];
+                return [4 /*yield*/, Promise.all(orders
+                        // sort the status  pending, completed, processing
+                        .sort(function (a, b) { return (a.status > b.status ? 1 : -1); })
+                        .map(function (order) { return __awaiter(void 0, void 0, void 0, function () {
+                        var food, vendor;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0: return [4 /*yield*/, models_1.Food.findById(order.foodId)];
+                                case 1:
+                                    food = _a.sent();
+                                    return [4 /*yield*/, models_1.Vendor.findById(order.vendorId)];
+                                case 2:
+                                    vendor = _a.sent();
+                                    return [2 /*return*/, __assign(__assign({ _id: order._id }, order["_doc"]), { 
+                                            //format the date
+                                            foodName: food.name, vendorName: vendor.name, status: order.status })];
+                            }
+                        });
+                    }); }))];
+            case 3:
+                response = _a.sent();
+                console.log(response);
+                return [2 /*return*/, res.status(200).json(response)];
+            case 4: return [2 /*return*/, res.status(400).json({ msg: "Error while Fetching Orders" })];
+        }
+    });
+}); };
+exports.GetOrdersStatus = GetOrdersStatus;
 //# sourceMappingURL=CustomerControllers.js.map

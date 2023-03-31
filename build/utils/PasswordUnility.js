@@ -78,20 +78,30 @@ var GenerateSignature = function (payload) { return __awaiter(void 0, void 0, vo
 }); };
 exports.GenerateSignature = GenerateSignature;
 var ValidateSignature = function (req) { return __awaiter(void 0, void 0, void 0, function () {
-    var signature, payload;
+    var token, signature, payload, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                signature = req.get("Authorization");
-                if (!signature) return [3 /*break*/, 2];
+                token = req.get("Authorization");
+                console.log(token);
+                if (!token) return [3 /*break*/, 5];
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 3, , 4]);
+                signature = token.replace(/['"]+/g, '');
                 return [4 /*yield*/, jsonwebtoken_1.default.verify(signature.split(" ")[1], config_1.APP_SECRET
                     //? this is called cassting
                     )];
-            case 1:
+            case 2:
                 payload = (_a.sent());
                 req.user = payload;
                 return [2 /*return*/, true];
-            case 2: return [2 /*return*/, false];
+            case 3:
+                error_1 = _a.sent();
+                return [2 /*return*/, false];
+            case 4: return [3 /*break*/, 6];
+            case 5: return [2 /*return*/, false];
+            case 6: return [2 /*return*/];
         }
     });
 }); };

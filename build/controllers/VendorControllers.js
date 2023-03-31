@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -36,10 +47,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetFoods = exports.UpdateVendorCoverImage = exports.AddFood = exports.UpdateVendorService = exports.UpdateVendorProfile = exports.GetVendorProfile = exports.VendorLogin = void 0;
+exports.GetOrders = exports.GetFoods = exports.UpdateVendorCoverImage = exports.AddFood = exports.UpdateVendorService = exports.UpdateVendorProfile = exports.GetVendorProfile = exports.VendorLogin = void 0;
 var AdminController_1 = require("./AdminController");
 var utils_1 = require("../utils");
 var models_1 = require("../models");
+var Order_1 = require("../models/Order");
 var cloudinary = require("cloudinary").v2;
 var VendorLogin = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, email, password, existingUser, validation, signature;
@@ -47,7 +59,6 @@ var VendorLogin = function (req, res, next) { return __awaiter(void 0, void 0, v
         switch (_b.label) {
             case 0:
                 _a = req.body, email = _a.email, password = _a.password;
-                console.log(email);
                 return [4 /*yield*/, (0, AdminController_1.FindVendor)("", email)];
             case 1:
                 existingUser = _b.sent();
@@ -64,7 +75,7 @@ var VendorLogin = function (req, res, next) { return __awaiter(void 0, void 0, v
                     })];
             case 3:
                 signature = _b.sent();
-                return [2 /*return*/, res.json(signature)];
+                return [2 /*return*/, res.json({ signature: signature, name: existingUser.name })];
             case 4: return [2 /*return*/, res.json({ messege: "Password isn not valid" })];
             case 5: return [2 /*return*/, res.json({ message: "Login credential is not valid" })];
         }
@@ -157,7 +168,7 @@ var AddFood = function (req, res, next) { return __awaiter(void 0, void 0, void 
                     })];
             case 2:
                 result_img = _b.sent();
-                console.log(result_img);
+                console.log(req);
                 return [4 /*yield*/, models_1.Food.create({
                         vendorId: vendor._id,
                         name: name,
@@ -171,7 +182,7 @@ var AddFood = function (req, res, next) { return __awaiter(void 0, void 0, void 
                     })];
             case 3:
                 food = _b.sent();
-                //! updating the vendor with the new food created
+                // //! updating the vendor with the new food created
                 vendor.foods.push(food._id);
                 return [4 /*yield*/, vendor.save()];
             case 4:
@@ -230,10 +241,74 @@ var GetFoods = function (req, res, next) { return __awaiter(void 0, void 0, void
                 if (foods !== null) {
                     return [2 /*return*/, res.json(foods)];
                 }
+                else {
+                    return [2 /*return*/, res.json({ message: "No food found" })];
+                }
                 _a.label = 2;
             case 2: return [2 /*return*/, res.json({ message: "Foods not found!" })];
         }
     });
 }); };
 exports.GetFoods = GetFoods;
+var GetOrders = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, orderId, status_1, orderUpdate, user, orders, responseArray, i, order, food, customer, firstName, lastName, fullName;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                if (!(req.method === "PUT")) return [3 /*break*/, 3];
+                _a = req.body, orderId = _a.orderId, status_1 = _a.status;
+                //? get the order
+                console.log(orderId, status_1);
+                orderUpdate = Order_1.Order.findByIdAndUpdate(orderId, { status: status_1 }, { new: true });
+                if (!orderUpdate) return [3 /*break*/, 3];
+                return [4 /*yield*/, orderUpdate];
+            case 1: 
+            //? save the order
+            return [4 /*yield*/, (_b.sent()).save()];
+            case 2:
+                //? save the order
+                _b.sent();
+                return [2 /*return*/, res.json({ message: "Order Updated" })];
+            case 3:
+                user = req.user;
+                if (!user) return [3 /*break*/, 10];
+                return [4 /*yield*/, Order_1.Order.find({ vendorId: user._id })];
+            case 4:
+                orders = _b.sent();
+                responseArray = [];
+                i = 0;
+                _b.label = 5;
+            case 5:
+                if (!(i < orders.length)) return [3 /*break*/, 9];
+                order = orders[i];
+                return [4 /*yield*/, models_1.Food.findOne({ _id: order.foodId })];
+            case 6:
+                food = _b.sent();
+                return [4 /*yield*/, models_1.Customer.findOne({ _id: order.customerId })];
+            case 7:
+                customer = _b.sent();
+                firstName = customer ? customer.firstName : "Customer";
+                lastName = customer ? customer.lastName : "Name";
+                fullName = firstName + " " + lastName;
+                // const updatedAt = new Date(order.["_doc"].updatedAt); // [order["_doc"].updatedAt
+                // const updated_date = updatedAt.toLocaleString();
+                // const createdAt = new Date(order.createdAt); // [order["_doc"].updatedAt
+                // const created_date = createdAt.toLocaleString();
+                responseArray.push(__assign(__assign({}, order["_doc"]), { foodName: food.name, customerName: fullName }));
+                console.log(i);
+                if (i === orders.length) {
+                    return [3 /*break*/, 9];
+                }
+                _b.label = 8;
+            case 8:
+                i++;
+                return [3 /*break*/, 5];
+            case 9: 
+            // console.log(responseArray);
+            return [2 /*return*/, res.json(responseArray)];
+            case 10: return [2 /*return*/];
+        }
+    });
+}); };
+exports.GetOrders = GetOrders;
 //# sourceMappingURL=VendorControllers.js.map

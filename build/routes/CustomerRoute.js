@@ -25,4 +25,5 @@ router.get("/otp", controllers_1.RequestOtp);
 // /* ------------------- Profile --------------------- */
 router.get("/profile", controllers_1.GetCustomerProfile);
 router.patch("/profile", controllers_1.EditCustomerProfile);
+router.get("/orders", controllers_1.GetOrdersStatus);
 //# sourceMappingURL=CustomerRoute.js.map

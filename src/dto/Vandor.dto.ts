@@ -44,3 +44,8 @@ export interface CreateOfferInputs {
   pincode: string;
   isActive: boolean;
 }
+
+export interface UpdateOrderInput {
+  orderId: string;
+  status: string;
+}

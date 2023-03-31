@@ -22,4 +22,7 @@ router.get('/search/:pincode', controllers_1.SearchFoods);
 // router.get('/offers/:pincode', GetAvailableOffers);
 /* ------------------- Find Restaurant by ID --------------------- */
 router.get('/restaurant/:id', controllers_1.RestaurantById);
+/* ----------------- find by Restaurant Name --------------------- */
+router.get('/restaurant-name/:name', controllers_1.RestaurantByName);
+router.post("/confirmorder", controllers_1.ConfrimOrder);
 //# sourceMappingURL=ShoppingRoutes.js.map

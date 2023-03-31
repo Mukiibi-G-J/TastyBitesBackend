@@ -5,7 +5,9 @@ import {
   CustomerVerify,
   EditCustomerProfile,
   GetCustomerProfile,
+  GetOrdersStatus,
   RequestOtp,
+  
 } from "../controllers";
 import { Authenticate } from "../middlewares";
 // import { AddToCart, CreateOrder, CreatePayment, CustomerLogin, CustomerSignUp, CustomerVerify, DeleteCart, EditCustomerProfile, GetCart, GetCustomerProfile, GetOrderById, GetOrders, RequestOtp, VerifyOffer } from '../controllers';
@@ -32,7 +34,7 @@ router.get("/otp", RequestOtp);
 // /* ------------------- Profile --------------------- */
 router.get("/profile", GetCustomerProfile);
 router.patch("/profile", EditCustomerProfile);
-
+router.get("/orders", GetOrdersStatus);
 // //Cart
 // router.post('/cart', AddToCart)
 // router.get('/cart', GetCart)

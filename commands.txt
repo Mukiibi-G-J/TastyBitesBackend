@@ -18,3 +18,8 @@ https://food-online-production-backend.herokuapp.com/
     "start": "node src/index.ts",
     // "build": "tsc -p .",
     // "postinstall": "npm run build"
+
+
+
+
+npm install nodemailer @types/nodemailer

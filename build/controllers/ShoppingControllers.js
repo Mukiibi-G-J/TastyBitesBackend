@@ -36,10 +36,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RestaurantById = exports.SearchFoods = exports.GetFoodsIn30Min = exports.GetAllRestaurants = exports.GetTopRestaurants = exports.GetFoodAvailability = void 0;
+exports.ConfrimOrder = exports.RestaurantByName = exports.RestaurantById = exports.SearchFoods = exports.GetFoodsIn30Min = exports.GetAllRestaurants = exports.GetTopRestaurants = exports.GetFoodAvailability = void 0;
 var models_1 = require("../models");
+var Order_1 = require("../models/Order");
 var GetFoodAvailability = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var pincode, result;
+    var pincode, result, data;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -53,7 +54,8 @@ var GetFoodAvailability = function (req, res, next) { return __awaiter(void 0, v
             case 1:
                 result = _a.sent();
                 if (result.length > 0) {
-                    return [2 /*return*/, res.status(200).json(result)];
+                    data = result.sort(function () { return Math.random() - 0.5; });
+                    return [2 /*return*/, res.status(200).json(data)];
                 }
                 return [2 /*return*/, res.status(404).json({ msg: "data Not found!" })];
         }
@@ -163,4 +165,80 @@ var RestaurantById = function (req, res, next) { return __awaiter(void 0, void 0
     });
 }); };
 exports.RestaurantById = RestaurantById;
+var RestaurantByName = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var name, result;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                name = req.params.name;
+                console.log(name);
+                return [4 /*yield*/, models_1.Vendor.findOne({ name: name }).populate("foods")];
+            case 1:
+                result = _a.sent();
+                if (result) {
+                    return [2 /*return*/, res.status(200).json(result)];
+                }
+                return [2 /*return*/, res.status(404).json({ msg: "Data not found!" })];
+        }
+    });
+}); };
+exports.RestaurantByName = RestaurantByName;
+// POST Order to DB
+var ConfrimOrder = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var order, email, myorder, customerQuery, customerId, i, foodIds, result, newOrder, _a;
+    var _b;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
+            case 0:
+                order = req.body.order;
+                email = req.body.email;
+                myorder = JSON.parse(order);
+                customerQuery = models_1.Customer.findOne({ email: email }).exec();
+                return [4 /*yield*/, customerQuery];
+            case 1: return [4 /*yield*/, (_c.sent())._id.toString()];
+            case 2:
+                customerId = _c.sent();
+                i = 0;
+                _c.label = 3;
+            case 3:
+                if (!(i < myorder.length)) return [3 /*break*/, 8];
+                foodIds = myorder[i].id;
+                return [4 /*yield*/, models_1.Vendor.findOne({ foods: { $in: foodIds } })];
+            case 4:
+                result = _c.sent();
+                _a = Order_1.Order.bind;
+                _b = {};
+                return [4 /*yield*/, result];
+            case 5:
+                newOrder = new (_a.apply(Order_1.Order, [void 0, (_b.vendorId = (_c.sent())._id.toString(),
+                        _b.customerId = customerId,
+                        _b.foodId = myorder[i].id,
+                        _b.image = myorder[i].image,
+                        _b.quantity = myorder[i].quantity,
+                        _b.totalprice = myorder[i].totalprice,
+                        _b.price = myorder[i].price,
+                        _b.status = "pending",
+                        _b)]))();
+                return [4 /*yield*/, newOrder.save()];
+            case 6:
+                _c.sent();
+                _c.label = 7;
+            case 7:
+                i++;
+                return [3 /*break*/, 3];
+            case 8: 
+            // create the order
+            // vendorId: { type: String, required: true },
+            // customerId: { type: String, required: true },
+            // foodId: { type: String, required: true },
+            // image: { type: String, required: true },
+            // quantity: { type: Number, required: true },
+            // totalprice: { type: String, required: true },
+            // price: { type: String, required: true },
+            // status:
+            return [2 /*return*/, res.status(200).json({ status: "Order created!" })];
+        }
+    });
+}); };
+exports.ConfrimOrder = ConfrimOrder;
 //# sourceMappingURL=ShoppingControllers.js.map

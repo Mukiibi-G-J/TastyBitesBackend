@@ -6,6 +6,7 @@ import fs from 'fs';
 import {
   AddFood,
   GetFoods,
+  GetOrders,
   GetVendorProfile,
   UpdateVendorCoverImage,
   UpdateVendorProfile,
@@ -34,6 +35,8 @@ const images = multer({ storage: imageStorage }).array('images', 10);
 
 router.post('/login', VendorLogin);
 router.use(Authenticate);
+router.get("/orders", GetOrders);
+router.put("/orders", GetOrders);
 router.get('/profile', GetVendorProfile);
 router.patch('/profile', UpdateVendorProfile);
 router.patch('/coverimage', images, UpdateVendorCoverImage);

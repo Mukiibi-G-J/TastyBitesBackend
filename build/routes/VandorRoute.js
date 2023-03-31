@@ -28,6 +28,8 @@ var imageStorage = multer_1.default.diskStorage({
 var images = (0, multer_1.default)({ storage: imageStorage }).array('images', 10);
 router.post('/login', controllers_1.VendorLogin);
 router.use(middlewares_1.Authenticate);
+router.get("/orders", controllers_1.GetOrders);
+router.put("/orders", controllers_1.GetOrders);
 router.get('/profile', controllers_1.GetVendorProfile);
 router.patch('/profile', controllers_1.UpdateVendorProfile);
 router.patch('/coverimage', images, controllers_1.UpdateVendorCoverImage);
